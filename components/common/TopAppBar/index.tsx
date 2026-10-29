@@ -2,7 +2,8 @@ import { cn } from "@/lib/utils";
 import { BackButton } from "./BackButton";
 
 interface TopAppBarProps {
-  title: string;
+  /** 없으면 제목 자리를 비워 둔다 (예: 화면 본문에 큰 제목이 있는 로그인) */
+  title?: string;
   /** 왼쪽 뒤로 가기 버튼 표시 */
   showBack?: boolean;
   /** 뒤로 가기 대상 경로. 없으면 브라우저 히스토리로 이동 */
@@ -25,7 +26,11 @@ export function TopAppBar({ title, showBack = false, backHref, caption, actions,
       )}
     >
       {showBack && <BackButton href={backHref} />}
-      <h1 className="min-w-0 flex-1 truncate text-18 font-semibold text-text-primary">{title}</h1>
+      {title ? (
+        <h1 className="min-w-0 flex-1 truncate text-18 font-semibold text-text-primary">{title}</h1>
+      ) : (
+        <span className="flex-1" />
+      )}
       {caption && <span className="shrink-0 text-14 font-medium text-text-secondary">{caption}</span>}
       {actions && <div className="flex shrink-0 items-center gap-[8px]">{actions}</div>}
     </header>

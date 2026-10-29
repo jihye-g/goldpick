@@ -6,11 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isAuthApiError } from "@supabase/supabase-js";
-import { CircleAlert } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/common/Button";
+import { TextField } from "@/components/common/TextField";
 import { loginSchema, type LoginFormValues } from "@/components/forms/schema/auth";
 import { useLogin } from "@/hooks/reactquery/auth";
 import { MAX_LOGIN_FAILURES, useLoginAttemptStore } from "@/stores/loginAttemptStore";
@@ -94,44 +91,47 @@ export function LoginForm() {
     : formError;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
-      {alertMessage && (
-        <Alert variant="destructive">
-          <CircleAlert />
-          <AlertDescription>{alertMessage}</AlertDescription>
-        </Alert>
-      )}
-      <div className="space-y-2">
-        <Label htmlFor="email">이메일</Label>
-        <Input
-          id="email"
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col gap-[16px] px-[16px]">
+        <TextField
+          label="이메일"
+          required
           type="email"
           autoComplete="email"
-          aria-invalid={!!errors.email}
+          placeholder="example@goldpick.kr"
+          status={errors.email ? "error" : "default"}
+          caption={errors.email?.message}
           {...register("email")}
         />
-        {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="password">비밀번호</Label>
-        <Input
-          id="password"
+        <TextField
+          label="비밀번호"
+          required
           type="password"
           autoComplete="current-password"
-          aria-invalid={!!errors.password}
+          placeholder="비밀번호를 입력하세요"
+          status={errors.password ? "error" : "default"}
+          caption={errors.password?.message}
           {...register("password")}
         />
-        {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
+        {alertMessage && (
+          <p role="alert" className="text-13 text-error-text">
+            {alertMessage}
+          </p>
+        )}
+        {/* Figma: 보조링크 (1791:888) — 13/Medium, 구분선 tertiary */}
+        <nav className="flex items-center justify-center gap-[8px] py-[16px] text-13 font-medium whitespace-nowrap">
+          <Link href="/find-email" className="text-text-secondary">이메일 찾기</Link>
+          <span aria-hidden="true" className="text-text-tertiary">|</span>
+          <Link href="/find-password" className="text-text-secondary">비밀번호 찾기</Link>
+          <span aria-hidden="true" className="text-text-tertiary">|</span>
+          <Link href="/signup" className="text-text-secondary">이메일로 가입하기</Link>
+        </nav>
       </div>
-      <Button type="submit" className="w-full" disabled={isPending || isLocked}>
-        {isPending ? "로그인 중..." : "로그인"}
-      </Button>
-      <p className="text-center text-sm text-muted-foreground">
-        계정이 없으신가요?{" "}
-        <Link href="/signup" className="font-medium text-foreground underline-offset-4 hover:underline">
-          회원가입
-        </Link>
-      </p>
+      <div className="px-[16px] pt-[8px] pb-[16px]">
+        <Button type="submit" className="w-full" disabled={isPending || isLocked}>
+          {isPending ? "로그인 중..." : "로그인"}
+        </Button>
+      </div>
     </form>
   );
 }
