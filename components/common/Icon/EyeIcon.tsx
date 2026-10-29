@@ -1,0 +1,10 @@
+import type { IconProps } from "./types";
+
+// Figma: eye-open (410:1723) — 조회수, 입력칸 비밀번호 보기
+export function EyeIcon(props: IconProps) {
+  return (
+    <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true" {...props}>
+      <path d="M21.6 12.119C21.6 12.119 19.3231 18.9754 12 18.8556C4.67692 18.7358 2.4 12.119 2.4 12.119C2.4 12.119 4.58462 5.14286 12 5.14286C19.4154 5.14286 21.6 12.119 21.6 12.119ZM14.4 12.0292C14.4 13.3189 13.3255 14.3645 12 14.3645C10.6745 14.3645 9.6 13.3189 9.6 12.0292C9.6 10.7394 10.6745 9.69381 12 9.69381C13.3255 9.69381 14.4 10.7394 14.4 12.0292Z" />
+    </svg>
+  );
+}

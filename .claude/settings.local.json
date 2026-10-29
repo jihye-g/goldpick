@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(npx --yes shadcn@latest add alert --yes)",
+      "PowerShell(npm run *)",
+      "PowerShell(npx tsc --noEmit -p . 2>&1 | Select-String -Pattern \"components/common/Icon|error TS\" | Select-Object -First 20; \"exit: $LASTEXITCODE\")",
+      "PowerShell(npx tsc --noEmit -p . 2>&1 | Select-Object -First 30; \"tsc exit: $LASTEXITCODE\"; npx eslint components/common components/ui/checkbox.tsx hooks/common/useToast.ts 2>&1 | Select-Object -First 30; \"eslint exit: $LASTEXITCODE\")",
+      "PowerShell(npx next build 2>&1 | Select-Object -Last 25; \"build exit: $LASTEXITCODE\")",
+      "PowerShell(npx tsc --noEmit -p . 2>&1 | Select-Object -First 20; \"tsc: $LASTEXITCODE\"; npx eslint \"app/\\(dev\\)\" 2>&1 | Select-Object -First 20; \"eslint: $LASTEXITCODE\"; npx next build 2>&1 | Select-Object -Last 12; \"build: $LASTEXITCODE\")",
+      "PowerShell(Set-Location \"Z:\\\\home\\\\jihye-g\\\\workspace\\\\onboarding\\\\goldpick\"; npx tsc --noEmit -p . 2>&1 | Select-Object -First 20; \"tsc: $LASTEXITCODE\"; npx eslint \"app/\\(dev\\)\" components/common 2>&1 | Select-Object -First 20; \"eslint: $LASTEXITCODE\"; npx next build 2>&1 | Select-Object -Last 14; \"build: $LASTEXITCODE\")",
+      "PowerShell(Set-Location \"Z:\\\\home\\\\jihye-g\\\\workspace\\\\onboarding\\\\goldpick\"; npx tsc --noEmit -p . 2>&1 | Select-Object -First 20; \"tsc: $LASTEXITCODE\"; npx next build 2>&1 | Select-String -Pattern \"design-system|error|Error|✓ Compiled|Route\" | Select-Object -First 15; \"build: $LASTEXITCODE\")",
+      "PowerShell(try { \\(Invoke-WebRequest -Uri \"http://localhost:3000/design-system\" -UseBasicParsing -TimeoutSec 5\\).StatusCode } catch { \"not running: $\\($_.Exception.Message\\)\" })"
+    ]
+  }
+}
