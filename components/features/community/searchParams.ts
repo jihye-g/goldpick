@@ -11,9 +11,12 @@ export function parseCategory(value: string | string[] | undefined): PostCategor
   return typeof value === "string" && value in CATEGORY_LABEL ? (value as PostCategory) : undefined;
 }
 
+// 너무 큰 값은 DB offset 범위를 넘어 조회 자체가 실패하므로 상한을 둔다
+const MAX_PAGE = 10_000;
+
 export function parsePage(value: string | string[] | undefined) {
   const page = Number(value);
-  return Number.isInteger(page) && page > 1 ? page : 1;
+  return Number.isInteger(page) && page > 1 ? Math.min(page, MAX_PAGE) : 1;
 }
 
 // 공백뿐이면 검색어 없음(10a), 너무 길면 앞부분만 쓴다

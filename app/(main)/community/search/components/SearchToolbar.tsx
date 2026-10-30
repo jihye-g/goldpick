@@ -19,7 +19,10 @@ export function SearchToolbar({ total, search, category }: SearchToolbarProps) {
 
   return (
     <div className="flex items-center justify-between px-[16px] pt-[12px]">
-      <p className="text-13 font-bold text-text-primary">{`총 ${total.toLocaleString()}건`}</p>
+      {/* 칩·정렬을 바꾸면 결과 수가 바뀌므로 스크린리더에 알린다 */}
+      <p aria-live="polite" className="text-13 font-bold text-text-primary">
+        {`총 ${total.toLocaleString("ko-KR")}건`}
+      </p>
       <SortSelect
         options={SORT_OPTIONS}
         value={search.sort}

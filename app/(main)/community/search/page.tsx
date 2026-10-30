@@ -11,6 +11,8 @@ type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 export default function CommunitySearchPage({ searchParams }: { searchParams: SearchParams }) {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-[480px] flex-col bg-bg-canvas">
+      {/* Figma 헤더에는 제목이 없어 화면에는 숨기고 스크린리더용으로만 둔다 */}
+      <h1 className="sr-only">커뮤니티 검색</h1>
       <Suspense fallback={<SearchHeaderFallback />}>
         <SearchHeaderSection searchParams={searchParams} />
       </Suspense>

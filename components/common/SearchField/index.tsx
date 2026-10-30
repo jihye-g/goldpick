@@ -34,7 +34,8 @@ export function SearchField({ showClear = false, onClear, className, ...props }:
           type="button"
           aria-label="검색어 지우기"
           onClick={onClear}
-          className="flex shrink-0 items-center justify-center text-text-tertiary"
+          // 아이콘은 18px 이지만 누르는 영역은 24px 로 넓힌다 (음수 margin 이라 배치는 그대로)
+          className="-m-[3px] flex shrink-0 items-center justify-center p-[3px] text-text-tertiary"
         >
           <ClearIcon className="size-[18px]" />
         </button>
