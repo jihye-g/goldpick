@@ -20,11 +20,15 @@ export interface PostDetail extends Post {
   imageUrls: string[];
 }
 
+// latest: 최신순 · popular: 조회수순
+export type PostSort = "latest" | "popular";
+
 export interface PostListParams {
   page?: number;
   limit?: number;
   keyword?: string;
   category?: PostCategory;
+  sort?: PostSort;
 }
 
 export interface PostListResponse {

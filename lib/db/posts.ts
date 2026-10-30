@@ -49,13 +49,23 @@ function toPostDetail(row: PostRow): PostDetail {
 // uuid 형식이 아닌 id(예: /community/search)는 Postgres 가 22P02 로 거절한다 — 없는 글로 취급
 export const INVALID_TEXT_REPRESENTATION = "22P02";
 
+// 검색어를 PostgREST or() 필터 값으로 쓴다 — LIKE 와일드카드(% _ \)는 글자 그대로, 쉼표·괄호가 있어도 깨지지 않게 큰따옴표로 감싼다
+function toIlikePattern(keyword: string) {
+  const escaped = keyword.replace(/[\\%_]/g, "\\$&");
+  return `"%${escaped.replace(/["\\]/g, "\\$&")}%"`;
+}
+
 export async function listPosts(
   client: Client,
-  { page = 1, limit = 10, keyword, category }: PostListParams = {}
+  { page = 1, limit = 10, keyword, category, sort = "latest" }: PostListParams = {}
 ): Promise<PostListResponse> {
   let query = client.from("posts").select(POST_COLUMNS, { count: "exact" });
   if (category) query = query.eq("category", category);
-  if (keyword) query = query.ilike("title", `%${keyword}%`);
+  if (keyword) {
+    const pattern = toIlikePattern(keyword);
+    query = query.or(`title.ilike.${pattern},content.ilike.${pattern}`);
+  }
+  if (sort === "popular") query = query.order("view_count", { ascending: false });
 
   const { data, error, count } = await query
     .order("created_at", { ascending: false })

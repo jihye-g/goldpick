@@ -14,5 +14,10 @@ export const commentSchema = z.object({
   isSecret: z.boolean(),
 });
 
+export const searchSchema = z.object({
+  keyword: z.string().trim().min(1, "검색어를 입력해주세요.").max(50, "검색어는 50자까지 입력할 수 있어요."),
+});
+
 export type PostFormValues = z.infer<typeof postSchema>;
 export type CommentFormValues = z.infer<typeof commentSchema>;
+export type SearchFormValues = z.infer<typeof searchSchema>;

@@ -4,14 +4,14 @@ import { Button } from "@/components/common/Button";
 import { BellIcon, PlusIcon, SearchIcon } from "@/components/common/Icon";
 import { IconButton } from "@/components/common/IconButton";
 import { TopAppBar } from "@/components/common/TopAppBar";
+import { CategoryChips } from "@/components/features/community/CategoryChips";
+import { PostList } from "@/components/features/community/PostList";
 import { parseCategory, parsePage } from "@/components/features/community/searchParams";
 import { postKeys } from "@/hooks/posts/keys";
 import { listPosts } from "@/lib/db/posts";
 import { getQueryClient } from "@/lib/reactquery/getQueryClient";
 import { createClient } from "@/lib/supabase/server";
 import type { PostListParams } from "@/models";
-import { CategoryChips } from "./components/CategoryChips";
-import { PostList } from "./components/PostList";
 
 const LIMIT = 10;
 
@@ -45,7 +45,7 @@ export default async function CommunityPage({
         title="커뮤니티"
         actions={
           <>
-            {/* TODO: 검색·알림 페이지가 생기면 실제 경로로 교체, 알림 점은 안 읽은 알림 수로 연결 */}
+            {/* TODO: 알림 페이지가 생기면 실제 경로로 교체, 알림 점은 안 읽은 알림 수로 연결 */}
             <IconButton size="compact" label="검색" render={<Link href="/community/search" />} nativeButton={false}>
               <SearchIcon />
             </IconButton>
@@ -56,8 +56,8 @@ export default async function CommunityPage({
         }
       />
       <div className="flex-1">
-        <CategoryChips value={category} />
-        <PostList data={data} category={category} page={page} limit={LIMIT} />
+        <CategoryChips basePath="/community" query={{ category }} />
+        <PostList data={data} basePath="/community" query={{ category, page }} limit={LIMIT} />
       </div>
       {/* Figma: FAB/글쓰기는 하단 내비 영역 위 10px, 오른쪽 16px */}
       <div className="sticky bottom-0">

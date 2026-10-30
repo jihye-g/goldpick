@@ -1,54 +1,45 @@
-"use client";
-
-import { useState } from "react";
-import { Search, X } from "lucide-react";
+import { CloseIcon, SearchIcon } from "@/components/common/Icon";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-interface SearchBarProps {
-  onSearch: (keyword: string) => void;
-  placeholder?: string;
-  defaultValue?: string;
-  className?: string;
-}
+type SearchBarProps = Omit<React.ComponentProps<typeof Input>, "type"> & {
+  /** 지우기(×) 버튼 클릭 — 넘기면 showClear 일 때 버튼이 보인다 */
+  onClear?: () => void;
+  /** 입력값이 있을 때 true */
+  showClear?: boolean;
+  containerClassName?: string;
+};
 
-export function SearchBar({ onSearch, placeholder = "검색어를 입력하세요", defaultValue = "", className }: SearchBarProps) {
-  const [value, setValue] = useState(defaultValue);
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    onSearch(value.trim());
-  };
-
-  const handleClear = () => {
-    setValue("");
-    onSearch("");
-  };
+// Figma: SearchField (2073:1132) — 44h 알약 · canvas 배경 · 좌 16 / 우 14(지우기 있을 때) · gap 8
+// 검색 아이콘 20px secondary, 값 14/Medium, 지우기 18px tertiary. 폼(제출)은 쓰는 쪽에서 감싼다.
+export function SearchBar({ onClear, showClear = false, containerClassName, className, ...props }: SearchBarProps) {
+  const clearVisible = showClear && onClear;
 
   return (
-    <form onSubmit={handleSubmit} className={cn("flex w-full items-center gap-2", className)}>
-      <div className="relative flex-1">
-        <Input
-          value={value}
-          onChange={(event) => setValue(event.target.value)}
-          placeholder={placeholder}
-          className="pr-8"
-        />
-        {value && (
-          <button
-            type="button"
-            onClick={handleClear}
-            aria-label="검색어 지우기"
-            className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-          >
-            <X className="size-4" />
-          </button>
+    <div
+      className={cn(
+        "flex h-[44px] w-full items-center gap-[8px] rounded-full bg-bg-canvas pl-[16px] focus-within:ring-1 focus-within:ring-primary",
+        clearVisible ? "pr-[14px]" : "pr-[16px]",
+        containerClassName
+      )}
+    >
+      <SearchIcon className="size-[20px] shrink-0 text-text-secondary" />
+      <Input
+        type="search"
+        enterKeyHint="search"
+        autoComplete="off"
+        className={cn(
+          "h-auto min-w-0 flex-1 rounded-none border-0 bg-transparent p-0 text-14 font-medium text-text-primary placeholder:text-text-tertiary md:text-14",
+          "focus-visible:ring-0 dark:bg-transparent [&::-webkit-search-cancel-button]:appearance-none",
+          className
         )}
-      </div>
-      <Button type="submit" size="icon" aria-label="검색">
-        <Search className="size-4" />
-      </Button>
-    </form>
+        {...props}
+      />
+      {clearVisible && (
+        <button type="button" onClick={onClear} aria-label="검색어 지우기" className="shrink-0 text-text-tertiary">
+          <CloseIcon className="size-[18px]" />
+        </button>
+      )}
+    </div>
   );
 }
