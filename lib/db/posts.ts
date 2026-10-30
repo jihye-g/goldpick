@@ -6,6 +6,7 @@ import type {
   PostDetail,
   PostListParams,
   PostListResponse,
+  PostSort,
   PostUpdateRequest,
 } from "@/models";
 
@@ -46,20 +47,52 @@ function toPostDetail(row: PostRow): PostDetail {
   };
 }
 
-// uuid 형식이 아닌 id(예: /community/search)는 Postgres 가 22P02 로 거절한다 — 없는 글로 취급
+// uuid 형식이 아닌 id(예: /community/abc)는 Postgres 가 22P02 로 거절한다 — 없는 글로 취급
 export const INVALID_TEXT_REPRESENTATION = "22P02";
+
+// 정렬 컬럼 — 같은 값이면 최신순, 그래도 같으면 id 로 순서를 고정해 페이지가 바뀌어도 글이 겹치거나 빠지지 않게 한다
+const SORT_COLUMNS: Record<PostSort, ("view_count" | "comment_count" | "created_at" | "id")[]> = {
+  latest: ["created_at", "id"],
+  views: ["view_count", "created_at", "id"],
+  comments: ["comment_count", "created_at", "id"],
+};
+
+// 검색어를 PostgREST or 필터의 ilike 값으로 바꾼다 (docs/policy/search-policy.md)
+// 1) `*` 는 PostgREST 가 `%` 로 바꾸는 와일드카드라 리터럴로 찾을 수 없어 뺀다
+// 2) LIKE 이스케이프 `\ % _`  3) 큰따옴표 값으로 감싸 쉼표·괄호·점이 or 구문을 깨지 않게 한다
+export function toOrIlikeValue(keyword: string) {
+  const literal = keyword.replaceAll("*", "");
+  if (!literal) return null;
+  const pattern = `%${literal.replace(/[\\%_]/g, (char) => `\\${char}`)}%`;
+  return `"${pattern.replace(/[\\"]/g, (char) => `\\${char}`)}"`;
+}
+
+// 마지막 페이지를 넘는 offset 은 PostgREST 가 416 으로 거절한다 — 빈 페이지로 취급하고 전체 개수만 따로 센다
+const RANGE_NOT_SATISFIABLE = "PGRST103";
 
 export async function listPosts(
   client: Client,
-  { page = 1, limit = 10, keyword, category }: PostListParams = {}
+  { page = 1, limit = 10, keyword, category, sort = "latest" }: PostListParams = {}
 ): Promise<PostListResponse> {
+  // `*` 만 입력한 검색어는 찾을 글자가 없다 — 전체 목록이 아니라 0건
+  const keywordValue = keyword ? toOrIlikeValue(keyword) : undefined;
+  if (keywordValue === null) return { data: [], total: 0 };
+  const keywordFilter = keywordValue && `title.ilike.${keywordValue},content.ilike.${keywordValue}`;
+
   let query = client.from("posts").select(POST_COLUMNS, { count: "exact" });
   if (category) query = query.eq("category", category);
-  if (keyword) query = query.ilike("title", `%${keyword}%`);
+  if (keywordFilter) query = query.or(keywordFilter);
+  for (const column of SORT_COLUMNS[sort]) query = query.order(column, { ascending: false });
 
-  const { data, error, count } = await query
-    .order("created_at", { ascending: false })
-    .range((page - 1) * limit, page * limit - 1);
+  const { data, error, count } = await query.range((page - 1) * limit, page * limit - 1);
+  if (error?.code === RANGE_NOT_SATISFIABLE) {
+    let countQuery = client.from("posts").select("id", { count: "exact", head: true });
+    if (category) countQuery = countQuery.eq("category", category);
+    if (keywordFilter) countQuery = countQuery.or(keywordFilter);
+    const { error: countError, count: total } = await countQuery;
+    if (countError) throw countError;
+    return { data: [], total: total ?? 0 };
+  }
   if (error) throw error;
   return { data: data.map(toPostDetail), total: count ?? 0 };
 }

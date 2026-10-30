@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { postSchema } from "@/components/forms/schema/community";
-import { parseCategory, parsePage } from "@/components/features/community/searchParams";
+import { parseCategory, parseKeyword, parsePage, parseSort } from "@/components/features/community/searchParams";
 import { readJson, requireUser, serverError, validationError } from "@/lib/api/response";
 import { createPost, listPosts } from "@/lib/db/posts";
 import { createClient } from "@/lib/supabase/server";
@@ -13,7 +13,7 @@ function parseLimit(value: string | null) {
   return Number.isInteger(limit) && limit > 0 ? Math.min(limit, MAX_LIMIT) : DEFAULT_LIMIT;
 }
 
-// GET /api/posts?page=1&limit=10&category=question&keyword=금 — 누구나
+// GET /api/posts?page=1&limit=10&category=question&keyword=금&sort=views — 누구나
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
 
@@ -23,7 +23,8 @@ export async function GET(request: NextRequest) {
       page: parsePage(searchParams.get("page") ?? undefined),
       limit: parseLimit(searchParams.get("limit")),
       category: parseCategory(searchParams.get("category") ?? undefined),
-      keyword: searchParams.get("keyword")?.trim() || undefined,
+      keyword: parseKeyword(searchParams.get("keyword") ?? undefined),
+      sort: parseSort(searchParams.get("sort") ?? undefined),
     });
     return NextResponse.json(result);
   } catch (error) {

@@ -5,7 +5,7 @@ import { IconButton } from "@/components/common/IconButton";
 import { BookmarkIcon, DotVerticalIcon, MessageSquareIcon } from "@/components/common/Icon";
 import type { Post } from "@/models";
 import { formatRelativeTime } from "@/lib/utils";
-import { CATEGORY_LABEL } from "@/components/features/community/constants";
+import { CATEGORY_LABEL } from "./constants";
 
 // Figma: Post (2651:10794) — px 16 · py 12, 본문 gap 12, 썸네일 있으면 제목 옆 64px
 export function PostCard({ post }: { post: Post }) {

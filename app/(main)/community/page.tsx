@@ -10,8 +10,8 @@ import { listPosts } from "@/lib/db/posts";
 import { getQueryClient } from "@/lib/reactquery/getQueryClient";
 import { createClient } from "@/lib/supabase/server";
 import type { PostListParams } from "@/models";
-import { CategoryChips } from "./components/CategoryChips";
-import { PostList } from "./components/PostList";
+import { CategoryChips } from "@/components/features/community/CategoryChips";
+import { PostList } from "@/components/features/community/PostList";
 
 const LIMIT = 10;
 
@@ -45,7 +45,7 @@ export default async function CommunityPage({
         title="커뮤니티"
         actions={
           <>
-            {/* TODO: 검색·알림 페이지가 생기면 실제 경로로 교체, 알림 점은 안 읽은 알림 수로 연결 */}
+            {/* TODO: 알림 페이지가 생기면 실제 경로로 교체, 알림 점은 안 읽은 알림 수로 연결 */}
             <IconButton size="compact" label="검색" render={<Link href="/community/search" />} nativeButton={false}>
               <SearchIcon />
             </IconButton>

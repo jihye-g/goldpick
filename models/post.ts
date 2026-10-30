@@ -20,11 +20,14 @@ export interface PostDetail extends Post {
   imageUrls: string[];
 }
 
+export type PostSort = "latest" | "views" | "comments";
+
 export interface PostListParams {
   page?: number;
   limit?: number;
   keyword?: string;
   category?: PostCategory;
+  sort?: PostSort;
 }
 
 export interface PostListResponse {
